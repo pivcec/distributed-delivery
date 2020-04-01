@@ -223,15 +223,24 @@ const data = [
 ];
 
 const Container = styled.div({
-  flex: 1
+  display: "flex",
+  flex: 1,
+  justifyContent: "center"
 });
+
+const ticks = data.reduce((acc, { name }) => {
+  if (!acc.includes(name)) {
+    acc.push(name);
+  }
+  return acc;
+}, []);
 
 const Bandwidth = () => {
   return (
     <Container>
       <AreaChart
         width={1400}
-        height={300}
+        height={200}
         data={data}
         margin={{
           top: 10,
@@ -240,52 +249,36 @@ const Bandwidth = () => {
           bottom: 0
         }}
       >
-        <XAxis
-          dataKey="name"
-          ticks={[
-            "2nd Nov",
-            "3rd Nov",
-            "4th Nov",
-            "5th Nov",
-            "6th Nov",
-            "7th Nov",
-            "8th Nov",
-            "9th Nov",
-            "10th Nov",
-            "11th Nov",
-            "12th Nov",
-            "13th Nov",
-            "14th Nov",
-            "15th Nov"
-          ]}
-        />
+        <XAxis dataKey="name" ticks={ticks} />
         <YAxis />
         <Tooltip />
         <ReferenceLine
-          y={7000}
-          label="Max PTP"
-          stroke="#8884d8"
-          strokeDasharray="3 3"
-        />
-        <Area
-          type="monotone"
-          dataKey="ptp"
-          stackId="1"
-          stroke="#8884d8"
-          fill="#8884d8"
-        />
-        <ReferenceLine
           y={9800}
           label="Max HTTP"
-          stroke="#82ca9d"
+          stroke="#3FCB7E"
           strokeDasharray="3 3"
         />
         <Area
           type="monotone"
           dataKey="http"
           stackId="1"
-          stroke="#82ca9d"
-          fill="#82ca9d"
+          strokeWidth={2}
+          stroke="#9A193E"
+          fill="#9A193E"
+        />
+        <ReferenceLine
+          y={7000}
+          label="Max PTP"
+          stroke="#12A5ED"
+          strokeDasharray="3 3"
+        />
+        <Area
+          type="monotone"
+          dataKey="ptp"
+          stackId="1"
+          strokeWidth={2}
+          stroke="#12A5ED"
+          fill="#12A5ED"
         />
       </AreaChart>
     </Container>
