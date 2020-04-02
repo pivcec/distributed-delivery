@@ -23,11 +23,15 @@ const Select = styled.select({
   outline: "none"
 });
 
+const handleChange = () => {
+  console.log("handle change");
+};
+
 const TrafficSelector = ({ selectedTrafficTitle }) => {
   return (
     <Container>
       <SelectWrapper>
-        <Select value={selectedTrafficTitle}>
+        <Select value={selectedTrafficTitle} onChange={handleChange}>
           <option value="volvo">traffic one</option>
           <option value="saab">traffic two</option>
           <option value="mercedes">traffic three</option>

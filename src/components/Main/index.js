@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import Bandwidth from "./Bandwidth";
 import Audience from "./Audience";
-import RangeSelector from "./RangeSelector/";
+import DateAndRangeSelector from "./DateAndRangeSelector";
 import TrafficSelector from "./TrafficSelector";
 
 const Container = styled.div({
@@ -31,7 +31,7 @@ const Main = () => {
       <TrafficSelector selectedTrafficTitle={"traffic one"} />
       <Bandwidth />
       <Audience />
-      <RangeSelector
+      <DateAndRangeSelector
         selectedStartDate={selectedStartDate}
         selectedEndDate={selectedEndDate}
         updateSelectedDate={updateSelectedDate}
