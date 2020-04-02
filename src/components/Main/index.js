@@ -12,22 +12,30 @@ const Container = styled.div({
 });
 
 const Main = () => {
-  const [selectedTraffic, setSelectedTraffic] = useState(null);
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [selectedTrafficId, setSelectedTrafficId] = useState(null);
+  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+
+  const updateSelectedDate = (startOrEnd, newDate) => {
+    console.log("update selected");
+  };
 
   useEffect(() => {
-    if ((selectedTraffic, selectedStartDate, selectedEndDate)) {
+    if ((selectedTrafficId, selectedStartDate, selectedEndDate)) {
       console.log("fetch data");
     }
-  }, [selectedTraffic, selectedStartDate, selectedEndDate]);
+  }, [selectedTrafficId, selectedStartDate, selectedEndDate]);
 
   return (
     <Container>
-      <TrafficSelector />
+      <TrafficSelector selectedTrafficTitle={"traffic one"} />
       <Bandwidth />
       <Audience />
-      <RangeSelector />
+      <RangeSelector
+        selectedStartDate={selectedStartDate}
+        selectedEndDate={selectedEndDate}
+        updateSelectedDate={updateSelectedDate}
+      />
     </Container>
   );
 };
