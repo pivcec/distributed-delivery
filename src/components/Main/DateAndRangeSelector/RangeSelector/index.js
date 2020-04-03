@@ -68,6 +68,8 @@ const RangeSelector = () => {
   const throttledSetRightHandlePosition = throttle(setRightHandlePosition, 300);
 
   useEffect(() => {
+    if (!selectorWidth || !data) return;
+
     setSpaceBetweenDataPoints(selectorWidth / data.length);
   }, [selectorWidth, data]);
 
