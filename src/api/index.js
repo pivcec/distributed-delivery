@@ -5,10 +5,10 @@ export const apiGet = async (endpoint, params) => {
   try {
     const response = await axios.get(`${url}${endpoint}${params}`);
     if (response) {
-      return response.data;
+      return response;
     }
   } catch (error) {
-    return error.response.status;
+    return error.response;
   }
 };
 
@@ -19,9 +19,9 @@ export const apiPost = async (endpoint, body) => {
       "Content-Type": "application/json"
     });
     if (response) {
-      return response.data;
+      return response;
     }
   } catch (error) {
-    return error.response.status;
+    return error.response;
   }
 };

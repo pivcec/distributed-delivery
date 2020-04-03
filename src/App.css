@@ -10,3 +10,7 @@ body,
   border: 2px solid #333;
   border-radius: 5px;
 }
+
+svg.recharts-surface tspan {
+  font-size: 12px !important;
+}

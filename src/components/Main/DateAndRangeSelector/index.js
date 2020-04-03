@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
 import DateSelector from "./DateSelector";
-import Range from "./RangeSelector";
+import RangeSelector from "./RangeSelector";
 
 const Container = styled.div`
   display: flex;
@@ -12,7 +12,8 @@ const Container = styled.div`
   flex-wrap: wrap;
 `;
 
-const RangeSelector = ({
+const DateAndRangeSelector = ({
+  bandwidthData,
   selectedStartDate,
   selectedEndDate,
   updateSelectedDate
@@ -24,7 +25,7 @@ const RangeSelector = ({
         selectedDate={selectedStartDate}
         updateSelectedDate={updateSelectedDate}
       />
-      <Range />
+      <RangeSelector bandwidthData={bandwidthData} />
       <DateSelector
         type={"end"}
         selectedDate={selectedEndDate}
@@ -34,10 +35,11 @@ const RangeSelector = ({
   );
 };
 
-RangeSelector.propTypes = {
+DateAndRangeSelector.propTypes = {
+  bandwidthData: PropTypes.object,
   selectedStartDate: PropTypes.object.isRequired,
   selectedEndDate: PropTypes.object.isRequired,
   updateSelectedDate: PropTypes.func.isRequired
 };
 
-export default RangeSelector;
+export default DateAndRangeSelector;

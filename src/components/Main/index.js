@@ -13,10 +13,23 @@ const Container = styled.div({
   flexDirection: "column"
 });
 
+const BandwidthLoader = styled.div({
+  display: "flex",
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center"
+});
+
 const Main = () => {
   const [userIsLoggedIn, setUserIsLoggedIn] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
-  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+  const [selectedStartDate, setSelectedStartDate] = useState(
+    new Date(2017, 10, 1)
+  );
+  const [selectedEndDate, setSelectedEndDate] = useState(
+    new Date(2017, 10, 16)
+  );
+  const [bandwidthData, setBandwidthData] = useState(null);
+  const [audienceData, setAudienceData] = useState(null);
 
   const updateSelectedDate = (startOrEnd, newDate) => {
     console.log("update selected");
@@ -24,14 +37,24 @@ const Main = () => {
 
   useEffect(() => {
     const getAuthToken = async () => {
-      const response = await apiPost("auth", {
+      const body = {
         identifiant: "urtoob",
         password: "ToobRU"
-      });
-      if (response !== 403) {
-        Cookie.set("authToken", response);
+      };
+
+      const response = await apiPost("auth", body);
+
+      const { data, status } = response;
+
+      if (status === 200) {
+        Cookie.set("authToken", data);
+      } else {
+        console.warn("get auth token failed with", status);
       }
-      setUserIsLoggedIn(true);
+
+      if (status === 403 || status === 200) {
+        setUserIsLoggedIn(true);
+      }
     };
 
     getAuthToken();
@@ -40,17 +63,37 @@ const Main = () => {
   useEffect(() => {
     if (!userIsLoggedIn || !selectedStartDate || !selectedEndDate) return;
 
-    const authToken = Cookie.get("authToken");
-    console.log("authToken", authToken);
-    console.log("fetch data");
+    const authToken = JSON.parse(Cookie.get("authToken"));
+
+    const getBandwidthData = async () => {
+      const body = {
+        ...authToken,
+        from: selectedStartDate.valueOf(),
+        to: selectedEndDate.valueOf()
+      };
+
+      const response = await apiPost("bandwidth", body);
+
+      const { data, status } = response;
+
+      if (status === 200) {
+        setBandwidthData(data);
+      }
+    };
+
+    getBandwidthData();
   }, [userIsLoggedIn, selectedStartDate, selectedEndDate]);
 
   return (
     <Container>
       <TrafficSelector selectedTrafficTitle={"traffic one"} />
-      <Bandwidth />
+      {!bandwidthData && (
+        <BandwidthLoader>loading bandwidth chart...</BandwidthLoader>
+      )}
+      {bandwidthData && <Bandwidth data={bandwidthData} />}
       <Audience />
       <DateAndRangeSelector
+        bandwidthData={bandwidthData}
         selectedStartDate={selectedStartDate}
         selectedEndDate={selectedEndDate}
         updateSelectedDate={updateSelectedDate}

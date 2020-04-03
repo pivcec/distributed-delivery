@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import PropTypes from "prop-types";
 import styled from "@emotion/styled";
 import throttle from "lodash.throttle";
 import Range from "./Range/";
 import Chart from "./Chart/";
 import Handle from "./Handle/";
-
-import data from "../../../../dummyData/chart";
 
 const Container = styled.div({ width: "60%", position: "relative" });
 
@@ -35,7 +34,7 @@ const useResize = ref => {
   return { selectorWidth, selectorLeftEdge, selectorRightEdge };
 };
 
-const RangeSelector = () => {
+const RangeSelector = ({ bandwidthData }) => {
   const [spaceBetweenDataPoints, setSpaceBetweenDataPoints] = useState(null);
   const [leftHandlePosition, setLeftHandlePosition] = useState(0);
   const [rightHandlePosition, setRightHandlePosition] = useState(0);
@@ -68,14 +67,14 @@ const RangeSelector = () => {
   const throttledSetRightHandlePosition = throttle(setRightHandlePosition, 300);
 
   useEffect(() => {
-    if (!selectorWidth || !data) return;
+    if (!selectorWidth || !bandwidthData) return;
 
-    setSpaceBetweenDataPoints(selectorWidth / data.length);
-  }, [selectorWidth, data]);
+    setSpaceBetweenDataPoints(selectorWidth / bandwidthData.length);
+  }, [selectorWidth, bandwidthData]);
 
   return (
     <Container ref={ref}>
-      <Chart data={data} />
+      {bandwidthData && <Chart data={bandwidthData} />}
       <Range
         leftRangePosition={leftHandlePosition}
         rightRangePosition={rightHandlePosition}
@@ -94,6 +93,10 @@ const RangeSelector = () => {
       </>
     </Container>
   );
+};
+
+RangeSelector.propTypes = {
+  bandwidthData: PropTypes.object
 };
 
 export default RangeSelector;
