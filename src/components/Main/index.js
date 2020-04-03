@@ -13,7 +13,7 @@ const Container = styled.div({
   flexDirection: "column"
 });
 
-const BandwidthLoader = styled.div({
+const ChartLoader = styled.div({
   display: "flex",
   flex: 1,
   justifyContent: "center",
@@ -33,6 +33,38 @@ const Main = () => {
 
   const updateSelectedDate = (startOrEnd, newDate) => {
     console.log("update selected");
+  };
+
+  const getBandwidthData = async authToken => {
+    const body = {
+      ...authToken,
+      from: selectedStartDate.valueOf(),
+      to: selectedEndDate.valueOf()
+    };
+
+    const response = await apiPost("bandwidth", body);
+
+    const { data, status } = response;
+
+    if (status === 200) {
+      setBandwidthData(data);
+    }
+  };
+
+  const getAudienceData = async authToken => {
+    const body = {
+      ...authToken,
+      from: selectedStartDate.valueOf(),
+      to: selectedEndDate.valueOf()
+    };
+
+    const response = await apiPost("audience", body);
+
+    const { data, status } = response;
+
+    if (status === 200) {
+      setAudienceData(data);
+    }
   };
 
   useEffect(() => {
@@ -65,33 +97,23 @@ const Main = () => {
 
     const authToken = JSON.parse(Cookie.get("authToken"));
 
-    const getBandwidthData = async () => {
-      const body = {
-        ...authToken,
-        from: selectedStartDate.valueOf(),
-        to: selectedEndDate.valueOf()
-      };
+    getBandwidthData(authToken);
 
-      const response = await apiPost("bandwidth", body);
-
-      const { data, status } = response;
-
-      if (status === 200) {
-        setBandwidthData(data);
-      }
-    };
-
-    getBandwidthData();
+    getAudienceData(authToken);
   }, [userIsLoggedIn, selectedStartDate, selectedEndDate]);
 
   return (
     <Container>
       <TrafficSelector selectedTrafficTitle={"traffic one"} />
-      {!bandwidthData && (
-        <BandwidthLoader>loading bandwidth chart...</BandwidthLoader>
+      {(!bandwidthData || !audienceData) && (
+        <ChartLoader>loading...</ChartLoader>
       )}
-      {bandwidthData && <Bandwidth data={bandwidthData} />}
-      <Audience />
+      {bandwidthData && audienceData && (
+        <>
+          <Bandwidth data={bandwidthData} />
+          <Audience data={audienceData} />
+        </>
+      )}
       <DateAndRangeSelector
         bandwidthData={bandwidthData}
         selectedStartDate={selectedStartDate}
