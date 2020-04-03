@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import styled from "@emotion/styled";
+import throttle from "lodash.throttle";
 import Range from "./Range/";
 import Chart from "./Chart/";
 import Handle from "./Handle/";
@@ -46,7 +47,7 @@ const RangeSelector = () => {
       const newLeftHandlePosition =
         ((e.clientX - selectorLeftEdge) / selectorWidth) * 100;
       if (newLeftHandlePosition < 100 && newLeftHandlePosition > 0) {
-        setLeftHandlePosition(newLeftHandlePosition);
+        throttledSetLeftHandlePosition(newLeftHandlePosition);
       }
     }
   };
@@ -57,10 +58,14 @@ const RangeSelector = () => {
         ((selectorWidth - (e.clientX - selectorLeftEdge)) / selectorWidth) *
         100;
       if (newRightHandlePosition < 100 && newRightHandlePosition > 0) {
-        setRightHandlePosition(newRightHandlePosition);
+        throttledSetRightHandlePosition(newRightHandlePosition);
       }
     }
   };
+
+  const throttledSetLeftHandlePosition = throttle(setLeftHandlePosition, 300);
+
+  const throttledSetRightHandlePosition = throttle(setRightHandlePosition, 300);
 
   useEffect(() => {
     setSpaceBetweenDataPoints(selectorWidth / data.length);
