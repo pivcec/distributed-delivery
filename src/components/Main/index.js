@@ -31,8 +31,12 @@ const Main = () => {
   const [bandwidthData, setBandwidthData] = useState(null);
   const [audienceData, setAudienceData] = useState(null);
 
-  const updateSelectedDate = (startOrEnd, newDate) => {
-    console.log("update selected");
+  const updateSelectedDate = (type, date) => {
+    if (type === "start") {
+      setSelectedStartDate(date);
+    } else {
+      setSelectedEndDate(date);
+    }
   };
 
   const getBandwidthData = async authToken => {
@@ -80,8 +84,6 @@ const Main = () => {
 
       if (status === 200) {
         Cookie.set("authToken", data);
-      } else {
-        console.warn("get auth token failed with", status);
       }
 
       if (status === 403 || status === 200) {

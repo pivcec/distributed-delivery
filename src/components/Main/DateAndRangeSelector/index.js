@@ -22,13 +22,15 @@ const DateAndRangeSelector = ({
     <Container>
       <DateSelector
         type={"start"}
-        selectedDate={selectedStartDate}
+        selectedStartDate={selectedStartDate}
+        selectedEndDate={selectedEndDate}
         updateSelectedDate={updateSelectedDate}
       />
       <RangeSelector bandwidthData={bandwidthData} />
       <DateSelector
         type={"end"}
-        selectedDate={selectedEndDate}
+        selectedStartDate={selectedStartDate}
+        selectedEndDate={selectedEndDate}
         updateSelectedDate={updateSelectedDate}
       />
     </Container>
