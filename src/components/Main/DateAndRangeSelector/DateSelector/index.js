@@ -7,22 +7,22 @@ import styled from "@emotion/styled";
 const Container = styled.div({});
 
 const DateSelector = ({
-  type,
+  position,
   selectedStartDate,
   selectedEndDate,
-  updateSelectedDate
+  updateSelectedDate,
 }) => {
   const day = 60 * 60 * 24 * 1000;
   const startDatePlusOne = new Date(selectedStartDate.getTime() + day);
   const endDateMinusOne = new Date(selectedEndDate.getTime() - day);
 
-  const handleUpdateSelectedDate = date => {
-    updateSelectedDate(type, date);
+  const handleUpdateSelectedDate = (date) => {
+    updateSelectedDate(position, date);
   };
 
   return (
     <Container>
-      {type === "start" && (
+      {position === "start" && (
         <DatePicker
           selected={selectedStartDate}
           maxDate={endDateMinusOne}
@@ -30,7 +30,7 @@ const DateSelector = ({
           dateFormat={"dd MMMM yyyy"}
         />
       )}
-      {type === "end" && (
+      {position === "end" && (
         <DatePicker
           selected={selectedEndDate}
           minDate={startDatePlusOne}
@@ -43,10 +43,10 @@ const DateSelector = ({
 };
 
 DateSelector.propTypes = {
-  type: PropTypes.string.isRequired,
+  position: PropTypes.string.isRequired,
   selectedStartDate: PropTypes.object.isRequired,
   selectedEndDate: PropTypes.object.isRequired,
-  updateSelectedDate: PropTypes.func.isRequired
+  updateSelectedDate: PropTypes.func.isRequired,
 };
 
 export default DateSelector;

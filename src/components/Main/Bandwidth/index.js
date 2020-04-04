@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
 import moment from "moment";
@@ -9,23 +9,27 @@ import {
   YAxis,
   Tooltip,
   ReferenceLine,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
 
 const Container = styled.div({
   display: "flex",
   flex: 1,
-  justifyContent: "center"
+  justifyContent: "center",
 });
 
-const getGb = bits => {
+const getGb = (bits) => {
   const kilobits = bits / 1024;
   const megabits = kilobits / 1024;
   const gigabits = megabits / 1024;
   return gigabits.toFixed(2);
 };
 
-const getFormattedData = data => {
+const getFormattedData = (
+  data,
+  leftSelectedTimestamp,
+  rightSelectedTimestamp
+) => {
   const numberOfEntries = data.cdn.length;
   const formattedData = [];
   let i;
@@ -40,7 +44,7 @@ const getFormattedData = data => {
       formattedData.push({
         date: cdnTimestamp,
         http: getGb(cdnBitrate),
-        ptp: getGb(ptpBitrate)
+        ptp: getGb(ptpBitrate),
       });
     }
   }
@@ -48,22 +52,31 @@ const getFormattedData = data => {
   return formattedData;
 };
 
-const Bandwidth = ({ data }) => {
+function MemoizedBandwidth({
+  data,
+  leftSelectedTimestamp,
+  rightSelectedTimestamp,
+}) {
+  const formattedData = getFormattedData(
+    data,
+    leftSelectedTimestamp,
+    rightSelectedTimestamp
+  );
   return (
     <Container>
       <ResponsiveContainer width="75%" height={200}>
         <AreaChart
-          data={getFormattedData(data)}
+          data={formattedData}
           margin={{
             top: 10,
             right: 30,
             left: 0,
-            bottom: 0
+            bottom: 0,
           }}
         >
           <XAxis
             dataKey="date"
-            tickFormatter={tick => moment.unix(tick / 1000).format("DD. MMM")}
+            tickFormatter={(tick) => moment.unix(tick / 1000).format("DD. MMM")}
           />
           <YAxis />
           <Tooltip />
@@ -99,10 +112,14 @@ const Bandwidth = ({ data }) => {
       </ResponsiveContainer>
     </Container>
   );
-};
+}
+
+const Bandwidth = memo(MemoizedBandwidth);
 
 Bandwidth.propTypes = {
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
+  leftSelectedTimestamp: PropTypes.string,
+  rightSelectedTimestamp: PropTypes.string,
 };
 
 export default Bandwidth;

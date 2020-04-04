@@ -4,8 +4,8 @@ import styled from "@emotion/styled";
 
 const Container = styled.div`
   top: 0;
-  left: ${props => props.left};
-  right: ${props => props.right};
+  left: ${(props) => props.left};
+  right: ${(props) => props.right};
   position: absolute;
   z-index: 11;
   height: 100%;
@@ -17,12 +17,13 @@ const Container = styled.div`
 const HandleSquare = styled.div({
   height: "50%",
   width: "100%",
-  backgroundColor: "white"
+  backgroundColor: "white",
 });
 
 const Handle = ({ position, handlePosition, updateHandlePosition }) => {
   const leftPosition = position === "left" ? `${handlePosition}%` : null;
   const rightPosition = position === "right" ? `${handlePosition}%` : null;
+
   return (
     <Container left={leftPosition} right={rightPosition}>
       <HandleSquare onDrag={updateHandlePosition} />
@@ -33,7 +34,7 @@ const Handle = ({ position, handlePosition, updateHandlePosition }) => {
 Handle.propTypes = {
   position: PropTypes.string.isRequired,
   handlePosition: PropTypes.number.isRequired,
-  updateHandlePosition: PropTypes.func.isRequired
+  updateHandlePosition: PropTypes.func.isRequired,
 };
 
 export default Handle;

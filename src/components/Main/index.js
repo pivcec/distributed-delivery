@@ -10,14 +10,14 @@ import TrafficSelector from "./TrafficSelector";
 const Container = styled.div({
   height: "100%",
   display: "flex",
-  flexDirection: "column"
+  flexDirection: "column",
 });
 
 const ChartLoader = styled.div({
   display: "flex",
   flex: 1,
   justifyContent: "center",
-  alignItems: "center"
+  alignItems: "center",
 });
 
 const Main = () => {
@@ -30,44 +30,22 @@ const Main = () => {
   );
   const [bandwidthData, setBandwidthData] = useState(null);
   const [audienceData, setAudienceData] = useState(null);
+  const [leftSelectedTimestamp, setLeftSelectedTimestamp] = useState(null);
+  const [rightSelectedTimestamp, setRightSelectedTimestamp] = useState(null);
 
-  const updateSelectedDate = (type, date) => {
-    if (type === "start") {
+  const updateSelectedDate = (position, date) => {
+    if (position === "start") {
       setSelectedStartDate(date);
     } else {
       setSelectedEndDate(date);
     }
   };
 
-  const getBandwidthData = async authToken => {
-    const body = {
-      ...authToken,
-      from: selectedStartDate.valueOf(),
-      to: selectedEndDate.valueOf()
-    };
-
-    const response = await apiPost("bandwidth", body);
-
-    const { data, status } = response;
-
-    if (status === 200) {
-      setBandwidthData(data);
-    }
-  };
-
-  const getAudienceData = async authToken => {
-    const body = {
-      ...authToken,
-      from: selectedStartDate.valueOf(),
-      to: selectedEndDate.valueOf()
-    };
-
-    const response = await apiPost("audience", body);
-
-    const { data, status } = response;
-
-    if (status === 200) {
-      setAudienceData(data);
+  const updateSelectedTimestamp = (position, timestamp) => {
+    if (position === "left") {
+      setLeftSelectedTimestamp(timestamp);
+    } else {
+      setRightSelectedTimestamp(timestamp);
     }
   };
 
@@ -75,7 +53,7 @@ const Main = () => {
     const getAuthToken = async () => {
       const body = {
         identifiant: "urtoob",
-        password: "ToobRU"
+        password: "ToobRU",
       };
 
       const response = await apiPost("auth", body);
@@ -99,9 +77,33 @@ const Main = () => {
 
     const authToken = JSON.parse(Cookie.get("authToken"));
 
-    getBandwidthData(authToken);
+    const getData = async (authToken, endpoint) => {
+      const body = {
+        ...authToken,
+        from: selectedStartDate.valueOf(),
+        to: selectedEndDate.valueOf(),
+      };
 
-    getAudienceData(authToken);
+      const response = await apiPost(endpoint, body);
+
+      const { data, status } = response;
+
+      if (status === 200) {
+        switch (endpoint) {
+          case "bandwidth":
+            setBandwidthData(data);
+            break;
+          case "audience":
+            setAudienceData(data);
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    getData(authToken, "bandwidth");
+    getData(authToken, "audience");
   }, [userIsLoggedIn, selectedStartDate, selectedEndDate]);
 
   return (
@@ -112,7 +114,11 @@ const Main = () => {
       )}
       {bandwidthData && audienceData && (
         <>
-          <Bandwidth data={bandwidthData} />
+          <Bandwidth
+            data={bandwidthData}
+            leftSelectedTimestamp={leftSelectedTimestamp}
+            rightSelectedTimestamp={rightSelectedTimestamp}
+          />
           <Audience data={audienceData} />
         </>
       )}
@@ -121,6 +127,7 @@ const Main = () => {
         selectedStartDate={selectedStartDate}
         selectedEndDate={selectedEndDate}
         updateSelectedDate={updateSelectedDate}
+        updateSelectedTimestamp={updateSelectedTimestamp}
       />
     </Container>
   );
