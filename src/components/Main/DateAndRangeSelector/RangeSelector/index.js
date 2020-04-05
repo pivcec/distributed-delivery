@@ -56,7 +56,10 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
   const handleLeftPositionUpdate = (e) => {
     if (e.clientX) {
       const newLeftHandlePosition = e.clientX - selectorLeftEdge;
-      if (newLeftHandlePosition > 0 && newLeftHandlePosition < selectorWidth) {
+      if (
+        newLeftHandlePosition > 0 &&
+        newLeftHandlePosition < selectorWidth - rightHandlePosition
+      ) {
         throttledSetLeftHandlePosition(newLeftHandlePosition);
       }
     }
@@ -68,7 +71,7 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
         selectorWidth - (e.clientX - selectorLeftEdge);
       if (
         newRightHandlePosition > 0 &&
-        newRightHandlePosition < selectorWidth
+        newRightHandlePosition < selectorWidth - leftHandlePosition
       ) {
         throttledSetRightHandlePosition(newRightHandlePosition);
       }

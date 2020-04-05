@@ -14,3 +14,7 @@ body,
 svg.recharts-surface tspan {
   font-size: 12px !important;
 }
+
+svg.recharts-surface {
+  overflow: visible;
+}
