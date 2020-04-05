@@ -13,7 +13,12 @@ import Range from "./Range/";
 import Chart from "./Chart/";
 import Handle from "./Handle/";
 
-const Container = styled.div({ width: "60%", position: "relative" });
+const Container = styled.div({
+  width: "60%",
+  position: "relative",
+  marginLeft: "10px",
+  marginRight: "10px",
+});
 
 const useResize = (ref) => {
   const [selectorWidth, setSelectorWidth] = useState(0);
@@ -149,12 +154,12 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
           <Handle
             position={"left"}
             updateHandlePosition={handleLeftPositionUpdate}
-            handlePosition={(leftHandlePosition / selectorWidth) * 100}
+            handlePosition={((leftHandlePosition - 5) / selectorWidth) * 100}
           />
           <Handle
             position={"right"}
             updateHandlePosition={handleRightPositionUpdate}
-            handlePosition={(rightHandlePosition / selectorWidth) * 100}
+            handlePosition={((rightHandlePosition - 5) / selectorWidth) * 100}
           />
         </>
       )}

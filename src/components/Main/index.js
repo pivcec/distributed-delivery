@@ -126,15 +126,15 @@ const Main = () => {
             selectedStartTimestampKey={selectedStartTimestampKey}
             selectedEndTimestampKey={selectedEndTimestampKey}
           />
+          <DateAndRangeSelector
+            bandwidthData={bandwidthData}
+            selectedStartDate={selectedStartDate}
+            selectedEndDate={selectedEndDate}
+            updateSelectedDate={updateSelectedDate}
+            updateSelectedTimestampKey={updateSelectedTimestampKey}
+          />
         </>
       )}
-      <DateAndRangeSelector
-        bandwidthData={bandwidthData}
-        selectedStartDate={selectedStartDate}
-        selectedEndDate={selectedEndDate}
-        updateSelectedDate={updateSelectedDate}
-        updateSelectedTimestampKey={updateSelectedTimestampKey}
-      />
     </Container>
   );
 };

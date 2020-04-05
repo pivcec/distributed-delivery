@@ -9,7 +9,7 @@ const Container = styled.div`
   position: absolute;
   z-index: 11;
   height: 100%;
-  width: 1%;
+  width: 10px;
   display: flex;
   align-items: center;
 `;
@@ -18,6 +18,17 @@ const HandleSquare = styled.div({
   height: "50%",
   width: "100%",
   backgroundColor: "white",
+  border: "1px solid #A1AEB8",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+});
+
+const HandleLines = styled.div({
+  height: "80%",
+  width: "30%",
+  borderRight: "1px solid #A1AEB8",
+  borderLeft: "1px solid #A1AEB8",
 });
 
 const Handle = ({ position, handlePosition, updateHandlePosition }) => {
@@ -26,7 +37,9 @@ const Handle = ({ position, handlePosition, updateHandlePosition }) => {
 
   return (
     <Container left={leftPosition} right={rightPosition}>
-      <HandleSquare onDrag={updateHandlePosition} />
+      <HandleSquare onDrag={updateHandlePosition}>
+        <HandleLines />
+      </HandleSquare>
     </Container>
   );
 };
