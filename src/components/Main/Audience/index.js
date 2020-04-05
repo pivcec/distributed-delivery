@@ -9,15 +9,59 @@ const Container = styled.div({
   justifyContent: "center",
 });
 
-const getFormattedData = (data) => {
+const getFormattedData = (
+  data,
+  selectedStartTimestampKey,
+  selectedEndTimestampKey
+) => {
+  const selectedStartTimestamp = selectedStartTimestampKey
+    ? data[selectedStartTimestampKey][0]
+    : null;
+  const selectedEndTimestamp = selectedEndTimestampKey
+    ? data[selectedEndTimestampKey][0]
+    : null;
+
   return data.reduce((acc, audience) => {
-    acc.push({ audience: audience[1] });
+    const timestamp = audience[0];
+    const viewers = audience[1];
+
+    if (!selectedStartTimestamp && !selectedEndTimestamp) {
+      acc.push({ audience: viewers });
+    } else if (
+      selectedStartTimestamp &&
+      !selectedEndTimestamp &&
+      timestamp > selectedStartTimestamp
+    ) {
+      acc.push({ audience: viewers });
+    } else if (
+      !selectedStartTimestamp &&
+      selectedEndTimestamp &&
+      timestamp < selectedStartTimestamp
+    ) {
+      acc.push({ audience: viewers });
+    } else if (
+      selectedStartTimestamp &&
+      selectedEndTimestamp &&
+      timestamp > selectedStartTimestamp &&
+      timestamp < selectedEndTimestamp
+    ) {
+      acc.push({ audience: viewers });
+    }
+
     return acc;
   }, []);
 };
 
-function MemoizedAudience({ data }) {
-  const formattedData = getFormattedData(data.audience);
+function MemoizedAudience({
+  data,
+  selectedStartTimestampKey,
+  selectedEndTimestampKey,
+}) {
+  const formattedData = getFormattedData(
+    data.audience,
+    selectedStartTimestampKey,
+    selectedEndTimestampKey
+  );
   return (
     <Container>
       <ResponsiveContainer width="75%" height={200}>
@@ -48,6 +92,8 @@ const Audience = memo(MemoizedAudience);
 
 Audience.propTypes = {
   data: PropTypes.object.isRequired,
+  selectedStartTimestampKey: PropTypes.number,
+  selectedEndTimestampKey: PropTypes.number,
 };
 
 export default Audience;

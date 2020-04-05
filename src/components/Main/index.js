@@ -121,7 +121,11 @@ const Main = () => {
             selectedStartTimestampKey={selectedStartTimestampKey}
             selectedEndTimestampKey={selectedEndTimestampKey}
           />
-          <Audience data={audienceData} />
+          <Audience
+            data={audienceData}
+            selectedStartTimestampKey={selectedStartTimestampKey}
+            selectedEndTimestampKey={selectedEndTimestampKey}
+          />
         </>
       )}
       <DateAndRangeSelector

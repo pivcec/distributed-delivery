@@ -1,9 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import styled from "@emotion/styled";
 import { AreaChart, Area, CartesianGrid, ResponsiveContainer } from "recharts";
 
-const getFormattedData = data => {
+const getFormattedData = (data) => {
   const numberOfEntries = data.cdn.length;
   const formattedData = [];
   let i;
@@ -32,7 +31,7 @@ const Chart = ({ data }) => {
 };
 
 Chart.propTypes = {
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
 };
 
 export default Chart;

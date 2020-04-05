@@ -30,8 +30,6 @@ const getFormattedData = (
   selectedStartTimestampKey,
   selectedEndTimestampKey
 ) => {
-  console.log("selectedStartTimestampKey", selectedStartTimestampKey);
-  console.log("selectedEndTimestampKey", selectedEndTimestampKey);
   const numberOfEntries = data.cdn.length;
   const formattedData = [];
   let i;
@@ -39,10 +37,46 @@ const getFormattedData = (
   for (i = 0; i < numberOfEntries; i++) {
     const cdnTimestamp = data.cdn[i][0];
     const cdnBitrate = data.cdn[i][1];
-    const ptpTimestamp = data.p2p[i][0];
     const ptpBitrate = data.p2p[i][1];
+    const selectedStartTimestamp = selectedStartTimestampKey
+      ? data.cdn[selectedStartTimestampKey][0]
+      : null;
+    const selectedEndTimestamp = selectedEndTimestampKey
+      ? data.cdn[selectedEndTimestampKey][0]
+      : null;
 
-    if (cdnTimestamp === ptpTimestamp) {
+    if (!selectedStartTimestamp && !selectedEndTimestamp) {
+      formattedData.push({
+        date: cdnTimestamp,
+        http: getGb(cdnBitrate),
+        ptp: getGb(ptpBitrate),
+      });
+    } else if (
+      selectedStartTimestamp &&
+      !selectedEndTimestamp &&
+      cdnTimestamp > selectedStartTimestamp
+    ) {
+      formattedData.push({
+        date: cdnTimestamp,
+        http: getGb(cdnBitrate),
+        ptp: getGb(ptpBitrate),
+      });
+    } else if (
+      !selectedStartTimestamp &&
+      selectedEndTimestamp &&
+      cdnTimestamp < selectedEndTimestamp
+    ) {
+      formattedData.push({
+        date: cdnTimestamp,
+        http: getGb(cdnBitrate),
+        ptp: getGb(ptpBitrate),
+      });
+    } else if (
+      selectedStartTimestamp &&
+      selectedEndTimestamp &&
+      cdnTimestamp > selectedStartTimestamp &&
+      cdnTimestamp < selectedEndTimestamp
+    ) {
       formattedData.push({
         date: cdnTimestamp,
         http: getGb(cdnBitrate),
