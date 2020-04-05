@@ -34,19 +34,18 @@ const useResize = (ref) => {
 };
 
 const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
-  const [spaceBetweenDataPoints, setSpaceBetweenDataPoints] = useState(null);
+  const [pixelsBetweenDataPoints, setPixelsBetweenDataPoints] = useState(null);
   const [leftHandlePosition, setLeftHandlePosition] = useState(0);
-  const debouncedLeftHandlePosition = useDebounce(leftHandlePosition, 500);
   const [rightHandlePosition, setRightHandlePosition] = useState(0);
+  const debouncedLeftHandlePosition = useDebounce(leftHandlePosition, 500);
   const debouncedRightHandlePosition = useDebounce(rightHandlePosition, 500);
   const ref = useRef();
   const { selectorWidth, selectorLeftEdge } = useResize(ref);
 
   const handleLeftPositionUpdate = (e) => {
     if (e.clientX) {
-      const newLeftHandlePosition =
-        ((e.clientX - selectorLeftEdge) / selectorWidth) * 100;
-      if (newLeftHandlePosition < 100 && newLeftHandlePosition > 0) {
+      const newLeftHandlePosition = e.clientX - selectorLeftEdge;
+      if (newLeftHandlePosition > 0 && newLeftHandlePosition < selectorWidth) {
         throttledSetLeftHandlePosition(newLeftHandlePosition);
       }
     }
@@ -55,9 +54,11 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
   const handleRightPositionUpdate = (e) => {
     if (e.clientX) {
       const newRightHandlePosition =
-        ((selectorWidth - (e.clientX - selectorLeftEdge)) / selectorWidth) *
-        100;
-      if (newRightHandlePosition < 100 && newRightHandlePosition > 0) {
+        selectorWidth - (e.clientX - selectorLeftEdge);
+      if (
+        newRightHandlePosition > 0 &&
+        newRightHandlePosition < selectorWidth
+      ) {
         throttledSetRightHandlePosition(newRightHandlePosition);
       }
     }
@@ -68,90 +69,100 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
   const throttledSetRightHandlePosition = throttle(setRightHandlePosition, 300);
 
   const getSelectedTimestamp = (
-    spaceBetweenDataPoints,
+    pixelsBetweenDataPoints,
     selectorWidth,
-    selectorLeftEdge,
     handlePosition,
     position
   ) => {
-    console.log("spaceBetweenDataPoints", spaceBetweenDataPoints);
-    console.log("selectorWidth", selectorWidth);
-    console.log("selectorLeftEdge", selectorLeftEdge);
-    console.log("handlePosition", handlePosition);
-    console.log("position", position);
+    const handlePositionFromLeftEdge =
+      position === "start" ? handlePosition : selectorWidth - handlePosition;
+
+    let i;
+    let acc = 0;
+    let selectedTimestamp;
+
+    for (i = 0; i < bandwidthData.cdn.length; i++) {
+      if (acc < handlePositionFromLeftEdge) {
+        acc = acc + pixelsBetweenDataPoints;
+      } else {
+        selectedTimestamp = bandwidthData.cdn[i][0];
+        break;
+      }
+    }
+
+    updateSelectedTimestamp(position, selectedTimestamp);
   };
 
   useEffect(() => {
     if (!selectorWidth || !bandwidthData) return;
 
-    setSpaceBetweenDataPoints(selectorWidth / bandwidthData.cdn.length);
+    setPixelsBetweenDataPoints(selectorWidth / bandwidthData.cdn.length);
   }, [selectorWidth, bandwidthData]);
 
   useEffect(() => {
     if (
-      !spaceBetweenDataPoints ||
+      !pixelsBetweenDataPoints ||
       !selectorWidth ||
-      !selectorLeftEdge ||
       !debouncedLeftHandlePosition
     )
       return;
 
     getSelectedTimestamp(
-      spaceBetweenDataPoints,
+      pixelsBetweenDataPoints,
       selectorWidth,
-      selectorLeftEdge,
       debouncedLeftHandlePosition,
       "start"
     );
   }, [
-    spaceBetweenDataPoints,
+    pixelsBetweenDataPoints,
     selectorWidth,
-    selectorLeftEdge,
     debouncedLeftHandlePosition,
+    getSelectedTimestamp,
   ]);
 
   useEffect(() => {
     if (
-      !spaceBetweenDataPoints ||
+      !pixelsBetweenDataPoints ||
       !selectorWidth ||
-      !selectorLeftEdge ||
       !debouncedRightHandlePosition
     )
       return;
 
     getSelectedTimestamp(
-      spaceBetweenDataPoints,
+      pixelsBetweenDataPoints,
       selectorWidth,
-      selectorLeftEdge,
       debouncedRightHandlePosition,
       "end"
     );
   }, [
-    spaceBetweenDataPoints,
+    bandwidthData,
+    pixelsBetweenDataPoints,
     selectorWidth,
-    selectorLeftEdge,
     debouncedRightHandlePosition,
+    getSelectedTimestamp,
   ]);
 
   return (
     <Container ref={ref}>
       {bandwidthData && <Chart data={bandwidthData} />}
-      <Range
-        leftRangePosition={leftHandlePosition}
-        rightRangePosition={rightHandlePosition}
-      />
-      <>
-        <Handle
-          position={"left"}
-          updateHandlePosition={handleLeftPositionUpdate}
-          handlePosition={leftHandlePosition}
-        />
-        <Handle
-          position={"right"}
-          updateHandlePosition={handleRightPositionUpdate}
-          handlePosition={rightHandlePosition}
-        />
-      </>
+      {selectorWidth && (
+        <>
+          <Range
+            leftRangePosition={(leftHandlePosition / selectorWidth) * 100}
+            rightRangePosition={(rightHandlePosition / selectorWidth) * 100}
+          />
+          <Handle
+            position={"left"}
+            updateHandlePosition={handleLeftPositionUpdate}
+            handlePosition={(leftHandlePosition / selectorWidth) * 100}
+          />
+          <Handle
+            position={"right"}
+            updateHandlePosition={handleRightPositionUpdate}
+            handlePosition={(rightHandlePosition / selectorWidth) * 100}
+          />
+        </>
+      )}
     </Container>
   );
 };

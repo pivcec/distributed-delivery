@@ -30,8 +30,8 @@ const Main = () => {
   );
   const [bandwidthData, setBandwidthData] = useState(null);
   const [audienceData, setAudienceData] = useState(null);
-  const [leftSelectedTimestamp, setLeftSelectedTimestamp] = useState(null);
-  const [rightSelectedTimestamp, setRightSelectedTimestamp] = useState(null);
+  const [startSelectedTimestamp, setStartSelectedTimestamp] = useState(null);
+  const [endSelectedTimestamp, setEndSelectedTimestamp] = useState(null);
 
   const updateSelectedDate = (position, date) => {
     if (position === "start") {
@@ -42,10 +42,10 @@ const Main = () => {
   };
 
   const updateSelectedTimestamp = (position, timestamp) => {
-    if (position === "left") {
-      setLeftSelectedTimestamp(timestamp);
+    if (position === "start") {
+      setStartSelectedTimestamp(timestamp);
     } else {
-      setRightSelectedTimestamp(timestamp);
+      setEndSelectedTimestamp(timestamp);
     }
   };
 
@@ -116,8 +116,8 @@ const Main = () => {
         <>
           <Bandwidth
             data={bandwidthData}
-            leftSelectedTimestamp={leftSelectedTimestamp}
-            rightSelectedTimestamp={rightSelectedTimestamp}
+            startSelectedTimestamp={startSelectedTimestamp}
+            endSelectedTimestamp={endSelectedTimestamp}
           />
           <Audience data={audienceData} />
         </>
