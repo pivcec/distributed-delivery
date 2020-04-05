@@ -27,11 +27,11 @@ const getGb = (bits) => {
 
 const getFormattedData = (
   data,
-  startSelectedTimestamp,
-  endSelectedTimestamp
+  selectedStartTimestampKey,
+  selectedEndTimestampKey
 ) => {
-  console.log("startSelectedTimestamp", startSelectedTimestamp);
-  console.log("endSelectedTimestamp", endSelectedTimestamp);
+  console.log("selectedStartTimestampKey", selectedStartTimestampKey);
+  console.log("selectedEndTimestampKey", selectedEndTimestampKey);
   const numberOfEntries = data.cdn.length;
   const formattedData = [];
   let i;
@@ -56,13 +56,13 @@ const getFormattedData = (
 
 function MemoizedBandwidth({
   data,
-  startSelectedTimestamp,
-  endSelectedTimestamp,
+  selectedStartTimestampKey,
+  selectedEndTimestampKey,
 }) {
   const formattedData = getFormattedData(
     data,
-    startSelectedTimestamp,
-    endSelectedTimestamp
+    selectedStartTimestampKey,
+    selectedEndTimestampKey
   );
   return (
     <Container>
@@ -120,8 +120,8 @@ const Bandwidth = memo(MemoizedBandwidth);
 
 Bandwidth.propTypes = {
   data: PropTypes.object.isRequired,
-  startSelectedTimestamp: PropTypes.number,
-  endSelectedTimestamp: PropTypes.number,
+  selectedStartTimestampKey: PropTypes.number,
+  selectedEndTimestampKey: PropTypes.number,
 };
 
 export default Bandwidth;

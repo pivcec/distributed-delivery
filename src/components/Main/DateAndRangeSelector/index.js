@@ -17,7 +17,7 @@ const DateAndRangeSelector = ({
   selectedStartDate,
   selectedEndDate,
   updateSelectedDate,
-  updateSelectedTimestamp,
+  updateSelectedTimestampKey,
 }) => {
   return (
     <Container>
@@ -29,7 +29,7 @@ const DateAndRangeSelector = ({
       />
       <RangeSelector
         bandwidthData={bandwidthData}
-        updateSelectedTimestamp={updateSelectedTimestamp}
+        updateSelectedTimestampKey={updateSelectedTimestampKey}
       />
       <DateSelector
         position={"end"}
@@ -46,7 +46,7 @@ DateAndRangeSelector.propTypes = {
   selectedStartDate: PropTypes.object.isRequired,
   selectedEndDate: PropTypes.object.isRequired,
   updateSelectedDate: PropTypes.func.isRequired,
-  updateSelectedTimestamp: PropTypes.func.isRequired,
+  updateSelectedTimestampKey: PropTypes.func.isRequired,
 };
 
 export default DateAndRangeSelector;

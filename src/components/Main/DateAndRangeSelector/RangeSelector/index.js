@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import { useDebounce } from "use-lodash-debounce";
 import throttle from "lodash.throttle";
 import PropTypes from "prop-types";
@@ -33,7 +39,7 @@ const useResize = (ref) => {
   return { selectorWidth, selectorLeftEdge };
 };
 
-const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
+const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
   const [pixelsBetweenDataPoints, setPixelsBetweenDataPoints] = useState(null);
   const [leftHandlePosition, setLeftHandlePosition] = useState(0);
   const [rightHandlePosition, setRightHandlePosition] = useState(0);
@@ -68,30 +74,19 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
 
   const throttledSetRightHandlePosition = throttle(setRightHandlePosition, 300);
 
-  const getSelectedTimestamp = (
-    pixelsBetweenDataPoints,
-    selectorWidth,
-    handlePosition,
-    position
-  ) => {
-    const handlePositionFromLeftEdge =
-      position === "start" ? handlePosition : selectorWidth - handlePosition;
+  const getSelectedTimestampKey = useCallback(
+    (pixelsBetweenDataPoints, selectorWidth, handlePosition, position) => {
+      const handlePositionFromLeftEdge =
+        position === "start" ? handlePosition : selectorWidth - handlePosition;
 
-    let i;
-    let acc = 0;
-    let selectedTimestamp;
+      const selectedTimestampKey = Math.round(
+        handlePositionFromLeftEdge / pixelsBetweenDataPoints
+      );
 
-    for (i = 0; i < bandwidthData.cdn.length; i++) {
-      if (acc < handlePositionFromLeftEdge) {
-        acc = acc + pixelsBetweenDataPoints;
-      } else {
-        selectedTimestamp = bandwidthData.cdn[i][0];
-        break;
-      }
-    }
-
-    updateSelectedTimestamp(position, selectedTimestamp);
-  };
+      updateSelectedTimestampKey(position, selectedTimestampKey);
+    },
+    [updateSelectedTimestampKey]
+  );
 
   useEffect(() => {
     if (!selectorWidth || !bandwidthData) return;
@@ -107,7 +102,7 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
     )
       return;
 
-    getSelectedTimestamp(
+    getSelectedTimestampKey(
       pixelsBetweenDataPoints,
       selectorWidth,
       debouncedLeftHandlePosition,
@@ -117,7 +112,7 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
     pixelsBetweenDataPoints,
     selectorWidth,
     debouncedLeftHandlePosition,
-    getSelectedTimestamp,
+    getSelectedTimestampKey,
   ]);
 
   useEffect(() => {
@@ -128,7 +123,7 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
     )
       return;
 
-    getSelectedTimestamp(
+    getSelectedTimestampKey(
       pixelsBetweenDataPoints,
       selectorWidth,
       debouncedRightHandlePosition,
@@ -139,7 +134,7 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
     pixelsBetweenDataPoints,
     selectorWidth,
     debouncedRightHandlePosition,
-    getSelectedTimestamp,
+    getSelectedTimestampKey,
   ]);
 
   return (
@@ -169,7 +164,7 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestamp }) => {
 
 RangeSelector.propTypes = {
   bandwidthData: PropTypes.object,
-  updateSelectedTimestamp: PropTypes.func.isRequired,
+  updateSelectedTimestampKey: PropTypes.func.isRequired,
 };
 
 export default RangeSelector;

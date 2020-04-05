@@ -30,8 +30,10 @@ const Main = () => {
   );
   const [bandwidthData, setBandwidthData] = useState(null);
   const [audienceData, setAudienceData] = useState(null);
-  const [startSelectedTimestamp, setStartSelectedTimestamp] = useState(null);
-  const [endSelectedTimestamp, setEndSelectedTimestamp] = useState(null);
+  const [selectedStartTimestampKey, setSelectedStartTimestampKey] = useState(
+    null
+  );
+  const [selectedEndTimestampKey, setSelectedEndTimestampKey] = useState(null);
 
   const updateSelectedDate = (position, date) => {
     if (position === "start") {
@@ -41,11 +43,11 @@ const Main = () => {
     }
   };
 
-  const updateSelectedTimestamp = (position, timestamp) => {
+  const updateSelectedTimestampKey = (position, selectedTimestampKey) => {
     if (position === "start") {
-      setStartSelectedTimestamp(timestamp);
+      setSelectedStartTimestampKey(selectedTimestampKey);
     } else {
-      setEndSelectedTimestamp(timestamp);
+      setSelectedEndTimestampKey(selectedTimestampKey);
     }
   };
 
@@ -116,8 +118,8 @@ const Main = () => {
         <>
           <Bandwidth
             data={bandwidthData}
-            startSelectedTimestamp={startSelectedTimestamp}
-            endSelectedTimestamp={endSelectedTimestamp}
+            selectedStartTimestampKey={selectedStartTimestampKey}
+            selectedEndTimestampKey={selectedEndTimestampKey}
           />
           <Audience data={audienceData} />
         </>
@@ -127,7 +129,7 @@ const Main = () => {
         selectedStartDate={selectedStartDate}
         selectedEndDate={selectedEndDate}
         updateSelectedDate={updateSelectedDate}
-        updateSelectedTimestamp={updateSelectedTimestamp}
+        updateSelectedTimestampKey={updateSelectedTimestampKey}
       />
     </Container>
   );
