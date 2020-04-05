@@ -88,6 +88,25 @@ const getFormattedData = (
   return formattedData;
 };
 
+const getMaximumThroughput = (formattedData) => {
+  return formattedData.reduce((acc, { http, ptp }) => {
+    const total = parseInt(http) + parseInt(ptp);
+    if (total > acc) {
+      acc = total;
+    }
+    return acc;
+  }, 0);
+};
+
+const getMaximumCDN = (formattedData) => {
+  return formattedData.reduce((acc, { http }) => {
+    if (http > acc) {
+      acc = http;
+    }
+    return acc;
+  }, 0);
+};
+
 function MemoizedBandwidth({
   data,
   selectedStartTimestampKey,
@@ -98,6 +117,11 @@ function MemoizedBandwidth({
     selectedStartTimestampKey,
     selectedEndTimestampKey
   );
+
+  const maximumThroughput = getMaximumThroughput(formattedData);
+
+  const maximumCDN = getMaximumCDN(formattedData);
+
   return (
     <Container>
       <ResponsiveContainer width="75%" height={200}>
@@ -133,14 +157,20 @@ function MemoizedBandwidth({
             fill="#12A5ED"
           />
           <ReferenceLine
-            y={308880047560}
-            label="Max"
+            y={maximumThroughput}
+            label={{
+              position: "top",
+              value: `Maximum throughput: ${maximumThroughput} Gbps`,
+            }}
             stroke="#3FCB7E"
             strokeDasharray="3 3"
           />
           <ReferenceLine
-            y={208880047560}
-            label="Max HTTP"
+            y={maximumCDN}
+            label={{
+              position: "top",
+              value: `Maximum CDN contribution: ${maximumCDN} Gbps`,
+            }}
             stroke="#9A193E"
             strokeDasharray="3 3"
           />
