@@ -165,24 +165,28 @@ const MemoizedBandwidth = ({
             stroke="#12A5ED"
             fill="#12A5ED"
           />
-          <ReferenceLine
-            y={maximumThroughput}
-            label={{
-              position: "top",
-              value: `Maximum throughput: ${maximumThroughput} Gbps`,
-            }}
-            stroke="#3FCB7E"
-            strokeDasharray="3 3"
-          />
-          <ReferenceLine
-            y={maximumCDN}
-            label={{
-              position: "top",
-              value: `Maximum CDN contribution: ${maximumCDN} Gbps`,
-            }}
-            stroke="#9A193E"
-            strokeDasharray="3 3"
-          />
+          {maximumThroughput && (
+            <ReferenceLine
+              y={maximumThroughput}
+              label={{
+                position: "top",
+                value: `Maximum throughput: ${maximumThroughput} Gbps`,
+              }}
+              stroke="#3FCB7E"
+              strokeDasharray="3 3"
+            />
+          )}
+          {maximumCDN && (
+            <ReferenceLine
+              y={maximumCDN}
+              label={{
+                position: "top",
+                value: `Maximum CDN contribution: ${maximumCDN} Gbps`,
+              }}
+              stroke="#9A193E"
+              strokeDasharray="3 3"
+            />
+          )}
         </AreaChart>
       </ResponsiveContainer>
     </Container>
