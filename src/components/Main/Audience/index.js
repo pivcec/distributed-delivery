@@ -1,12 +1,25 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import moment from "moment";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 const Container = styled.div({
   display: "flex",
   flex: 1,
   justifyContent: "center",
+});
+
+const Title = styled.div({
+  color: "#333",
+  margin: "10px",
 });
 
 const getFormattedData = (
@@ -26,30 +39,34 @@ const getFormattedData = (
     const viewers = audience[1];
 
     if (!selectedStartTimestamp && !selectedEndTimestamp) {
-      acc.push({ audience: viewers });
+      acc.push({ audience: viewers, date: timestamp });
     } else if (
       selectedStartTimestamp &&
       !selectedEndTimestamp &&
       timestamp > selectedStartTimestamp
     ) {
-      acc.push({ audience: viewers });
+      acc.push({ audience: viewers, date: timestamp });
     } else if (
       !selectedStartTimestamp &&
       selectedEndTimestamp &&
       timestamp < selectedStartTimestamp
     ) {
-      acc.push({ audience: viewers });
+      acc.push({ audience: viewers, date: timestamp });
     } else if (
       selectedStartTimestamp &&
       selectedEndTimestamp &&
       timestamp > selectedStartTimestamp &&
       timestamp < selectedEndTimestamp
     ) {
-      acc.push({ audience: viewers });
+      acc.push({ audience: viewers, date: timestamp });
     }
 
     return acc;
   }, []);
+};
+
+const renderLegend = () => {
+  return <Title>CONCURRENT VIEWERS</Title>;
 };
 
 function MemoizedAudience({
@@ -74,7 +91,12 @@ function MemoizedAudience({
             bottom: 0,
           }}
         >
-          <XAxis hide={true} />
+          <Legend content={renderLegend} verticalAlign={"top"} />
+
+          <XAxis
+            dataKey="date"
+            tickFormatter={(tick) => moment.unix(tick / 1000).format("DD. MMM")}
+          />
           <YAxis axisLine={false} tickLine={false} />
           <Line
             type="monotone"

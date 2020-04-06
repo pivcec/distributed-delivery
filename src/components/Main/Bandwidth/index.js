@@ -10,6 +10,7 @@ import {
   Tooltip,
   ReferenceLine,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import TooltipContent from "./TooltipContent/";
 
@@ -17,6 +18,11 @@ const Container = styled.div({
   display: "flex",
   flex: 1,
   justifyContent: "center",
+});
+
+const Title = styled.div({
+  color: "#333",
+  margin: "10px",
 });
 
 const getGb = (bits) => {
@@ -131,6 +137,10 @@ const MemoizedBandwidth = ({
 
   const maximumCDN = getMaximumCDN(formattedData);
 
+  const renderLegend = () => {
+    return <Title>CAPACITY OFFLOAD</Title>;
+  };
+
   return (
     <Container>
       <ResponsiveContainer width="75%" height={200}>
@@ -143,6 +153,7 @@ const MemoizedBandwidth = ({
             bottom: 0,
           }}
         >
+          <Legend content={renderLegend} verticalAlign={"top"} />
           <XAxis
             dataKey="date"
             tickFormatter={(tick) => moment.unix(tick / 1000).format("DD. MMM")}
