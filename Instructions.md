@@ -12,6 +12,6 @@
 
 ## Important Notes
 
-- Mock API server has been updated to allow for CORS requests
+- Mock API server has been updated to allow for CORS requests: https://github.com/pivcec/distributed-delivery-backend
 
 - Nov 1st to Nov 15th will provide data
