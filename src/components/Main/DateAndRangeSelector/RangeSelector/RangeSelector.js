@@ -9,9 +9,9 @@ import { useDebounce } from "use-lodash-debounce";
 import throttle from "lodash.throttle";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
-import Range from "./Range/";
-import Chart from "./Chart/";
-import Handle from "./Handle/";
+import Range from "./Range/Range";
+import Chart from "./Chart/Chart";
+import Handle from "./Handle/Handle";
 
 const Container = styled.div({
   width: "60%",

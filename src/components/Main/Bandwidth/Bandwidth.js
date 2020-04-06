@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import TooltipContent from "./TooltipContent/";
+import TooltipContent from "./TooltipContent/TooltipContent";
 
 const Container = styled.div({
   display: "flex",

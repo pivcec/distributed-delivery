@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Cookie from "js-cookie";
 import styled from "@emotion/styled";
-import { apiPost } from "../../api/";
-import Bandwidth from "./Bandwidth";
-import Audience from "./Audience";
-import DateAndRangeSelector from "./DateAndRangeSelector";
-import TrafficSelector from "./TrafficSelector";
+import { apiPost } from "../../api";
+import Bandwidth from "./Bandwidth/Bandwidth";
+import Audience from "./Audience/Audience";
+import DateAndRangeSelector from "./DateAndRangeSelector/DateAndRangeSelector";
+import TrafficSelector from "./TrafficSelector/TrafficSelector";
 
 const Container = styled.div({
   height: "100%",

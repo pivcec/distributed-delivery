@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
-import DateSelector from "./DateSelector";
-import RangeSelector from "./RangeSelector";
+import DateSelector from "./DateSelector/DateSelector";
+import RangeSelector from "./RangeSelector/RangeSelector";
 
 const Container = styled.div`
   display: flex;
