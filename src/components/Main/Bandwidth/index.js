@@ -11,6 +11,7 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from "recharts";
+import TooltipContent from "./TooltipContent/";
 
 const Container = styled.div({
   display: "flex",
@@ -18,31 +19,18 @@ const Container = styled.div({
   justifyContent: "center",
 });
 
-const TooltipContainer = styled.div({
-  backgroundColor: "#ffffff",
-  padding: "10px",
-  fontSize: "12px",
-});
-
-const TooltipLabelContainer = styled.div({
-  paddingBottom: "10px",
-  fontWeight: "bold",
-});
-
-const TooltipItem = styled.span`
-  color: ${(props) => props.color};
-  padding-right: ${(props) => (props.paddingRight ? props.paddingRight : null)};
-`;
-
-const TooltipContentContainer = styled.div({
-  paddingTop: "30px",
-});
-
 const getGb = (bits) => {
   const kilobits = bits / 1024;
   const megabits = kilobits / 1024;
   const gigabits = megabits / 1024;
   return gigabits.toFixed(2);
+};
+
+const checkIfKeyExistsInData = (cdn, key) => {
+  if (cdn.length >= key) {
+    return cdn[key][0];
+  }
+  return null;
 };
 
 const getFormattedData = (
@@ -58,11 +46,12 @@ const getFormattedData = (
     const cdnTimestamp = data.cdn[i][0];
     const cdnBitrate = data.cdn[i][1];
     const ptpBitrate = data.p2p[i][1];
+
     const selectedStartTimestamp = selectedStartTimestampKey
-      ? data.cdn[selectedStartTimestampKey][0]
+      ? checkIfKeyExistsInData(data.cdn, selectedStartTimestampKey)
       : null;
     const selectedEndTimestamp = selectedEndTimestampKey
-      ? data.cdn[selectedEndTimestampKey][0]
+      ? checkIfKeyExistsInData(data.cdn, selectedEndTimestampKey)
       : null;
 
     if (!selectedStartTimestamp && !selectedEndTimestamp) {
@@ -127,19 +116,11 @@ const getMaximumCDN = (formattedData) => {
   }, 0);
 };
 
-const getTotalAndSpikeReduction = (payload) => {
-  const http = parseInt(payload[0].value);
-  const ptp = parseInt(payload[1].value);
-  const total = http + ptp;
-  const spikeReduction = Math.ceil((ptp / total) * 100);
-  return { total, spikeReduction };
-};
-
-function MemoizedBandwidth({
+const MemoizedBandwidth = ({
   data,
   selectedStartTimestampKey,
   selectedEndTimestampKey,
-}) {
+}) => {
   const formattedData = getFormattedData(
     data,
     selectedStartTimestampKey,
@@ -149,51 +130,6 @@ function MemoizedBandwidth({
   const maximumThroughput = getMaximumThroughput(formattedData);
 
   const maximumCDN = getMaximumCDN(formattedData);
-
-  const getTooltipContent = (tooltipProps) => {
-    const { label, payload } = tooltipProps;
-    const totalAndSpikeReduction =
-      payload.length > 0 ? getTotalAndSpikeReduction(payload) : null;
-    return (
-      <TooltipContainer>
-        <TooltipLabelContainer>
-          {moment.unix(label / 1000).format("ddd, MMMM DD, YYYY h:mm A")}
-        </TooltipLabelContainer>
-        {payload.map(({ name, value, stroke }) => (
-          <div key={name}>
-            <TooltipItem paddingRight={"10px"} color={stroke}>
-              •
-            </TooltipItem>
-            <TooltipItem
-              paddingRight={"10px"}
-              color={"#333"}
-            >{`${name}:`}</TooltipItem>
-            <TooltipItem color={stroke}>{`${value}Gbps`}</TooltipItem>
-          </div>
-        ))}
-        {totalAndSpikeReduction && (
-          <TooltipContentContainer>
-            <div>
-              <TooltipItem paddingRight={"10px"} color={"#333"}>
-                {"Total:"}
-              </TooltipItem>
-              <TooltipItem color={"#3FCB7E"}>
-                {`${totalAndSpikeReduction.total}Gbps`}
-              </TooltipItem>
-            </div>
-            <div>
-              <TooltipItem paddingRight={"10px"} color={"#333"}>
-                {"Spike reduction:"}
-              </TooltipItem>
-              <TooltipItem color={"#12A5ED"}>
-                {`${totalAndSpikeReduction.spikeReduction}%`}
-              </TooltipItem>
-            </div>
-          </TooltipContentContainer>
-        )}
-      </TooltipContainer>
-    );
-  };
 
   return (
     <Container>
@@ -212,7 +148,7 @@ function MemoizedBandwidth({
             tickFormatter={(tick) => moment.unix(tick / 1000).format("DD. MMM")}
           />
           <YAxis />
-          <Tooltip content={getTooltipContent} />
+          <Tooltip content={TooltipContent} />
           <Area
             type="monotone"
             dataKey="http"
@@ -251,7 +187,7 @@ function MemoizedBandwidth({
       </ResponsiveContainer>
     </Container>
   );
-}
+};
 
 const Bandwidth = memo(MemoizedBandwidth);
 
