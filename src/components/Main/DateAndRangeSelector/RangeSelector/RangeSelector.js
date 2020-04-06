@@ -138,7 +138,6 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
       "end"
     );
   }, [
-    bandwidthData,
     pixelsBetweenDataPoints,
     selectorWidth,
     debouncedRightHandlePosition,

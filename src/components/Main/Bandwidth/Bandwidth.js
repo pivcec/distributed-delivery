@@ -33,7 +33,7 @@ const getGb = (bits) => {
 };
 
 const checkIfKeyExistsInData = (cdn, key) => {
-  if (cdn.length >= key) {
+  if (cdn.length - 1 >= key) {
     return cdn[key][0];
   }
   return null;
