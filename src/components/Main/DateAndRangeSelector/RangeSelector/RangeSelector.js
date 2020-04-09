@@ -5,19 +5,24 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import { useDebounce } from "use-lodash-debounce";
-import throttle from "lodash.throttle";
+import { Stage, Layer } from "react-konva";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
-import Range from "./Range/Range";
 import Chart from "./Chart/Chart";
 import Handle from "./Handle/Handle";
 
 const Container = styled.div({
+  height: "50px",
   width: "60%",
   position: "relative",
   marginLeft: "10px",
   marginRight: "10px",
+});
+
+const StageContainer = styled.div({
+  position: "absolute",
+  height: "50px",
+  top: 0,
 });
 
 const useResize = (ref) => {
@@ -46,49 +51,25 @@ const useResize = (ref) => {
 
 const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
   const [pixelsBetweenDataPoints, setPixelsBetweenDataPoints] = useState(null);
-  const [leftHandlePosition, setLeftHandlePosition] = useState(0);
-  const [rightHandlePosition, setRightHandlePosition] = useState(0);
-  const debouncedLeftHandlePosition = useDebounce(leftHandlePosition, 500);
-  const debouncedRightHandlePosition = useDebounce(rightHandlePosition, 500);
+  const [trackedLeftHandlePosition, setTrackedLeftHandlePosition] = useState(0);
+  const [trackedRightHandlePosition, setTrackedRightHandlePosition] = useState(
+    0
+  );
   const ref = useRef();
   const { selectorWidth, selectorLeftEdge } = useResize(ref);
 
-  const handleLeftPositionUpdate = (e) => {
-    if (e.clientX) {
-      const newLeftHandlePosition = e.clientX - selectorLeftEdge;
-      if (
-        newLeftHandlePosition > 0 &&
-        newLeftHandlePosition < selectorWidth - rightHandlePosition
-      ) {
-        throttledSetLeftHandlePosition(newLeftHandlePosition);
-      }
-    }
+  const handleLeftTrackedPositionUpdate = (newLeftHandlePosition) => {
+    setTrackedLeftHandlePosition(newLeftHandlePosition);
   };
 
-  const handleRightPositionUpdate = (e) => {
-    if (e.clientX) {
-      const newRightHandlePosition =
-        selectorWidth - (e.clientX - selectorLeftEdge);
-      if (
-        newRightHandlePosition > 0 &&
-        newRightHandlePosition < selectorWidth - leftHandlePosition
-      ) {
-        throttledSetRightHandlePosition(newRightHandlePosition);
-      }
-    }
+  const handleRightTrackedPositionUpdate = (newRightHandlePosition) => {
+    setTrackedRightHandlePosition(newRightHandlePosition);
   };
-
-  const throttledSetLeftHandlePosition = throttle(setLeftHandlePosition, 300);
-
-  const throttledSetRightHandlePosition = throttle(setRightHandlePosition, 300);
 
   const getSelectedTimestampKey = useCallback(
     (pixelsBetweenDataPoints, selectorWidth, handlePosition, position) => {
-      const handlePositionFromLeftEdge =
-        position === "start" ? handlePosition : selectorWidth - handlePosition;
-
       const selectedTimestampKey = Math.round(
-        handlePositionFromLeftEdge / pixelsBetweenDataPoints
+        handlePosition / pixelsBetweenDataPoints
       );
 
       updateSelectedTimestampKey(position, selectedTimestampKey);
@@ -106,20 +87,20 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
     if (
       !pixelsBetweenDataPoints ||
       !selectorWidth ||
-      !debouncedLeftHandlePosition
+      trackedLeftHandlePosition === null
     )
       return;
 
     getSelectedTimestampKey(
       pixelsBetweenDataPoints,
       selectorWidth,
-      debouncedLeftHandlePosition,
+      trackedLeftHandlePosition,
       "start"
     );
   }, [
     pixelsBetweenDataPoints,
     selectorWidth,
-    debouncedLeftHandlePosition,
+    trackedLeftHandlePosition,
     getSelectedTimestampKey,
   ]);
 
@@ -127,43 +108,47 @@ const RangeSelector = ({ bandwidthData, updateSelectedTimestampKey }) => {
     if (
       !pixelsBetweenDataPoints ||
       !selectorWidth ||
-      !debouncedRightHandlePosition
+      trackedRightHandlePosition === null
     )
       return;
 
     getSelectedTimestampKey(
       pixelsBetweenDataPoints,
       selectorWidth,
-      debouncedRightHandlePosition,
+      trackedRightHandlePosition,
       "end"
     );
   }, [
     pixelsBetweenDataPoints,
     selectorWidth,
-    debouncedRightHandlePosition,
+    trackedRightHandlePosition,
     getSelectedTimestampKey,
   ]);
 
   return (
     <Container ref={ref}>
-      {bandwidthData && <Chart data={bandwidthData} />}
+      {bandwidthData && selectorWidth && (
+        <Chart data={bandwidthData} selectorWidth={selectorWidth} />
+      )}
       {selectorWidth && (
-        <>
-          <Range
-            leftRangePosition={(leftHandlePosition / selectorWidth) * 100}
-            rightRangePosition={(rightHandlePosition / selectorWidth) * 100}
-          />
-          <Handle
-            position={"left"}
-            updateHandlePosition={handleLeftPositionUpdate}
-            handlePosition={((leftHandlePosition - 5) / selectorWidth) * 100}
-          />
-          <Handle
-            position={"right"}
-            updateHandlePosition={handleRightPositionUpdate}
-            handlePosition={((rightHandlePosition - 5) / selectorWidth) * 100}
-          />
-        </>
+        <StageContainer>
+          <Stage width={selectorWidth} height={50}>
+            <Layer>
+              <Handle
+                leftOrRight={"left"}
+                updateTrackedHandlePosition={handleLeftTrackedPositionUpdate}
+                selectorWidth={selectorWidth}
+                otherTrackedHandlePosition={trackedRightHandlePosition}
+              />
+              <Handle
+                leftOrRight={"right"}
+                updateTrackedHandlePosition={handleRightTrackedPositionUpdate}
+                selectorWidth={selectorWidth}
+                otherTrackedHandlePosition={trackedLeftHandlePosition}
+              />
+            </Layer>
+          </Stage>
+        </StageContainer>
       )}
     </Container>
   );

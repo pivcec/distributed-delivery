@@ -1,53 +1,132 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
-import styled from "@emotion/styled";
+import debounce from "lodash.debounce";
+import { Rect } from "react-konva";
+import handle from "../../../../../assets/handle.png";
+import MaskedArea from "./MaskedArea/MaskedArea";
 
-const Container = styled.div`
-  top: 0;
-  left: ${(props) => props.left};
-  right: ${(props) => props.right};
-  position: absolute;
-  z-index: 11;
-  height: 100%;
-  width: 10px;
-  display: flex;
-  align-items: center;
-`;
+const handleWidth = 10;
+const doubleHandleWidth = handleWidth * 2;
 
-const HandleSquare = styled.div({
-  height: "50%",
-  width: "100%",
-  backgroundColor: "white",
-  border: "1px solid #A1AEB8",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-});
+const Handle = ({
+  leftOrRight,
+  updateTrackedHandlePosition,
+  selectorWidth,
+  otherTrackedHandlePosition,
+}) => {
+  const [x, setX] = useState(0);
+  const [fillPatternImage, setFillPatternImage] = useState(null);
 
-const HandleLines = styled.div({
-  height: "80%",
-  width: "30%",
-  borderRight: "1px solid #A1AEB8",
-  borderLeft: "1px solid #A1AEB8",
-});
+  const checkBoundariesLeftHandle = (x, otherTrackedHandlePosition) => {
+    if (x < 0) {
+      return 0;
+    } else if (
+      otherTrackedHandlePosition &&
+      x > otherTrackedHandlePosition - doubleHandleWidth
+    ) {
+      return otherTrackedHandlePosition - doubleHandleWidth;
+    }
+    return x;
+  };
 
-const Handle = ({ position, handlePosition, updateHandlePosition }) => {
-  const leftPosition = position === "left" ? `${handlePosition}%` : null;
-  const rightPosition = position === "right" ? `${handlePosition}%` : null;
+  const checkBoundariesRightHandle = (x, otherTrackedHandlePosition) => {
+    if (x > selectorWidth - handleWidth) {
+      return selectorWidth - handleWidth;
+    } else if (x < otherTrackedHandlePosition + handleWidth) {
+      return otherTrackedHandlePosition + handleWidth;
+    }
+    return x;
+  };
+
+  const getNewHandlePosition = (x, leftOrRight, otherTrackedHandlePosition) => {
+    if (leftOrRight === "left") {
+      const newPosition = checkBoundariesLeftHandle(
+        x,
+        otherTrackedHandlePosition
+      );
+      setX(newPosition);
+      return newPosition;
+    }
+    const newPosition = checkBoundariesRightHandle(
+      x,
+      otherTrackedHandlePosition
+    );
+    setX(newPosition + handleWidth);
+    return newPosition;
+  };
+
+  const debouncedUpdateHandlePosition = useCallback(
+    debounce(updateTrackedHandlePosition, 500),
+    []
+  );
+
+  useEffect(() => {
+    debouncedUpdateHandlePosition(x);
+  }, [x, debouncedUpdateHandlePosition]);
+
+  useEffect(() => {
+    const image = new window.Image();
+    image.onload = () => {
+      setFillPatternImage(image);
+    };
+    image.src = handle;
+  }, []);
+
+  const dragBoundFunc = (pos) => {
+    const newHandlePosition = getNewHandlePosition(
+      pos.x,
+      leftOrRight,
+      otherTrackedHandlePosition
+    );
+    return {
+      x: newHandlePosition,
+      y: 10,
+    };
+  };
 
   return (
-    <Container left={leftPosition} right={rightPosition}>
-      <HandleSquare onDrag={updateHandlePosition}>
-        <HandleLines />
-      </HandleSquare>
-    </Container>
+    <>
+      <MaskedArea
+        x={x}
+        leftOrRight={leftOrRight}
+        selectorWidth={selectorWidth}
+        handleWidth={handleWidth}
+      />
+      {leftOrRight === "left" && (
+        <Rect
+          x={0}
+          y={10}
+          draggable={true}
+          width={10}
+          height={30}
+          dragBoundFunc={dragBoundFunc}
+          stroke={"#333"}
+          strokeWidth={1}
+          fillPatternImage={fillPatternImage}
+        />
+      )}
+      {leftOrRight === "right" && (
+        <Rect
+          x={selectorWidth - handleWidth}
+          y={10}
+          draggable={true}
+          width={10}
+          height={30}
+          dragBoundFunc={dragBoundFunc}
+          stroke={"#333"}
+          strokeWidth={1}
+          fillPatternImage={fillPatternImage}
+        />
+      )}
+    </>
   );
 };
 
 Handle.propTypes = {
-  position: PropTypes.string.isRequired,
-  handlePosition: PropTypes.number.isRequired,
-  updateHandlePosition: PropTypes.func.isRequired,
+  leftOrRight: PropTypes.string.isRequired,
+  updateTrackedHandlePosition: PropTypes.func.isRequired,
+  selectorWidth: PropTypes.number.isRequired,
+  otherTrackedHandlePosition: PropTypes.number.isRequired,
 };
 
 export default Handle;

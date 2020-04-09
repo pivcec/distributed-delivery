@@ -22,16 +22,23 @@ const Title = styled.div({
   margin: "10px",
 });
 
+const checkIfKeyExistsInData = (data, key) => {
+  if (data.length - 1 >= key) {
+    return data[key][0];
+  }
+  return null;
+};
+
 const getFormattedData = (
   data,
   selectedStartTimestampKey,
   selectedEndTimestampKey
 ) => {
   const selectedStartTimestamp = selectedStartTimestampKey
-    ? data[selectedStartTimestampKey][0]
+    ? checkIfKeyExistsInData(data, selectedStartTimestampKey)
     : null;
   const selectedEndTimestamp = selectedEndTimestampKey
-    ? data[selectedEndTimestampKey][0]
+    ? checkIfKeyExistsInData(data, selectedEndTimestampKey)
     : null;
 
   return data.reduce((acc, audience) => {
@@ -49,7 +56,7 @@ const getFormattedData = (
     } else if (
       !selectedStartTimestamp &&
       selectedEndTimestamp &&
-      timestamp < selectedStartTimestamp
+      timestamp < selectedEndTimestamp
     ) {
       acc.push({ audience: viewers, date: timestamp });
     } else if (
